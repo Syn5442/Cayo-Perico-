@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INTEL: CAYO PERICO</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --bg: #000000;
+            --card-bg: #111111;
+            --border: #333333;
+            --text: #ffffff;
+            --text-dim: #666666;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            margin: 0;
+            padding: 15px;
+            text-transform: uppercase;
+            font-size: 13px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        header {
+            border-bottom: 2px solid var(--text);
+            padding-bottom: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 15px;
+        }
+
+        .card-header {
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+            display: block;
+        }
+
+        /* Inputs */
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'Space Mono', monospace;
+            outline: none;
+        }
+
+        .btn-tgl {
+            flex: 1;
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            cursor: pointer;
+            font-family: 'Space Mono', monospace;
+            font-size: 10px;
+        }
+
+        .btn-tgl.active {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Loot Row */
+        .loot-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .btn-count {
+            width: 24px;
+            height: 24px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        /* Map Overlay */
+        .map-wrapper {
+            position: relative;
+            border: 1px solid var(--border);
+            background: #000;
+            line-height: 0;
+        }
+
+        .map-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Gold Locations on your specific image */
+        .hotspot {
+            position: absolute;
+            cursor: pointer;
+            border: 1px dashed rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.05);
+            transition: 0.2s;
+        }
+
+        .hotspot:hover { background: rgba(255,255,255,0.15); }
+        
+        .hotspot.active {
+            background: rgba(255,255,255,0.4);
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px #fff;
+        }
+
+        /* Payouts */
+        .player-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+
+        .player-take { font-size: 1.2rem; font-weight: bold; }
+
+        .footer-summary {
+            border: 2px solid var(--text);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bag-meter { height: 6px; background: #222; margin-top: 8px; border: 1px solid var(--border); }
+        .bag-fill { height: 100%; background: #fff; width: 0%; transition: 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>INTEL: CAYO_PERICO_SYSTEM</h1>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <span class="card-header">01_PRIMARY_TARGET</span>
+            <select id="primary" onchange="calculate()">
+                <option value="630000">Sinsimito Tequila</option>
+                <option value="700000">Ruby Necklace</option>
+                <option value="770000">Bearer Bonds</option>
+                <option value="1100000">Madrazo Files</option>
+                <option value="1300000" selected>Pink Diamond</option>
+                <option value="1900000">Panther Statue</option>
+            </select>
+
+            <div style="display:flex; gap:5px; margin: 12px 0;">
+                <button id="hardBtn" class="btn-tgl" onclick="toggleHard()">HARD_MODE</button>
+                <button id="eliteBtn" class="btn-tgl active" onclick="toggleElite()">ELITE</button>
+            </div>
+
+            <span class="card-header">02_SECONDARY_LOOT</span>
+            <div class="loot-row"><span>Cocaine</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-count" onclick="changeLoot('coke', -1)">-</button>
+                    <span id="coke-val">0</span>
+                    <button class="btn-count" onclick="changeLoot('coke', 1)">+</button>
+                </div>
+            </div>
+            <div class="loot-row"><span>Weed</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-count" onclick="changeLoot('weed', -1)">-</button>
+                    <span id="weed-val">0</span>
+                    <button class="btn-count" onclick="changeLoot('weed', 1)">+</button>
+                </div>
+            </div>
+            <div class="loot-row"><span>Paintings</span>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <button class="btn-count" onclick="changeLoot('paint', -1)">-</button>
+                    <span id="paint-val">0</span>
+                    <button class="btn-count" onclick="changeLoot('paint', 1)">+</button>
+                </div>
+            </div>
+
+            <div style="margin-top:15px;">
+                <span class="card-header">BAG_CAPACITY: <span id="bag-pct">0%</span></span>
+                <div class="bag-meter"><div id="bag-fill" class="bag-fill"></div></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <span class="card-header">03_COMPOUND_MAP_OVERLAY</span>
+            <div class="map-wrapper">
+                <img src="map.png" class="map-img">
+                <!-- Exact locations for Gold on your image -->
+                <div id="room-office" class="hotspot" style="top: 51%; left: 38%; width: 8%; height: 8%;" onclick="toggleRoom('room-office')"></div>
+                <div id="room-north" class="hotspot" style="top: 45%; left: 50%; width: 6%; height: 6%;" onclick="toggleRoom('room-north')"></div>
+                <div id="room-west" class="hotspot" style="top: 52%; left: 30%; width: 6%; height: 6%;" onclick="toggleRoom('room-west')"></div>
+                <div id="room-south" class="hotspot" style="top: 75%; left: 40%; width: 6%; height: 6%;" onclick="toggleRoom('room-south')"></div>
+            </div>
+
+            <div style="margin-top:15px;">
+                <span class="card-header">04_OPERATIVE_PAYOUTS</span>
+                <div id="player-list"></div>
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button class="btn-tgl" onclick="addPlayer()">+ OPERATIVE</button>
+                    <button class="btn-tgl" onclick="removePlayer()">- REMOVE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-summary">
+        <div>
+            <span style="font-size:10px; color:var(--text-dim);">TOTAL_NET_TAKE</span>
+            <div id="total-net" style="font-size:1.5rem; font-weight:bold;">$0</div>
+        </div>
+        <div style="text-align:right">
+            <span style="font-size:10px; color:var(--text-dim);">FEES (12%)</span>
+            <div id="total-fees" style="font-size:0.9rem;">$0</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let players = [85, 15];
+    let isHard = false, isElite = true, goldCount = 0;
+    let loot = { coke: 0, weed: 0, paint: 0 };
+
+    function changeLoot(type, amt) {
+        loot[type] = Math.max(0, loot[type] + amt);
+        document.getElementById(type + '-val').innerText = loot[type];
+        calculate();
+    }
+
+    function toggleHard() { isHard = !isHard; document.getElementById('hardBtn').classList.toggle('active'); calculate(); }
+    function toggleElite() { isElite = !isElite; document.getElementById('eliteBtn').classList.toggle('active'); calculate(); }
+    function toggleRoom(id) { document.getElementById(id).classList.toggle('active'); goldCount = document.querySelectorAll('.hotspot.active').length; calculate(); }
+    function addPlayer() { if(players.length < 4) { players.push(0); calculate(); } }
+    function removePlayer() { if(players.length > 1) { players.pop(); calculate(); } }
+    function updateCut(i, val) { players[i] = parseInt(val) || 0; calculate(); }
+
+    function calculate() {
+        let primary = parseInt(document.getElementById('primary').value);
+        if(isHard) primary *= 1.1;
+        const secVal = (goldCount * 332000) + (loot.coke * 220000) + (loot.paint * 189000) + (loot.weed * 147000);
+        const weight = (goldCount * 0.66) + (loot.coke * 0.5) + (loot.paint * 0.5) + (loot.weed * 0.375);
+        const pct = (weight / players.length) * 100;
+        const fill = document.getElementById('bag-fill');
+        fill.style.width = Math.min(pct, 100) + "%";
+        fill.style.background = pct > 100 ? "#ff0000" : "#fff";
+        document.getElementById('bag-pct').innerText = Math.floor(pct) + "%";
+        const gross = primary + secVal + 75000; 
+        const fees = gross * 0.12;
+        const eliteBonus = isElite ? (isHard ? 100000 : 50000) : 0;
+        const net = (gross - fees) + (eliteBonus * players.length);
+        document.getElementById('total-net').innerText = `$${Math.floor(net).toLocaleString()}`;
+        document.getElementById('total-fees').innerText = `-$${Math.floor(fees).toLocaleString()}`;
+        const list = document.getElementById('player-list');
+        list.innerHTML = '';
+        players.forEach((cut, i) => {
+            const take = net * (cut/100);
+            list.innerHTML += `<div class="player-box">
+                <div><div style="font-size:9px; color:var(--text-dim);">OP_0${i+1}</div><div class="player-take">$${Math.floor(take).toLocaleString()}</div></div>
+                <div style="display:flex; align-items:center; gap:8px;"><input type="number" step="5" value="${cut}" oninput="updateCut(${i}, this.value)" style="width:50px; text-align:center;"><span>%</span></div>
+            </div>`;
+        });
+    }
+    calculate();
+</script>
+
+</body>
+</html>
